@@ -1,0 +1,9 @@
+CREATE OR REPLACE FUNCTION GetCircles(timestamp)
+RETURNS SETOF "Figures" AS 
+$$ With "DateFiltered" AS (SELECT * FROM "Figures" WHERE "DateAndTime" = $1)
+
+SELECT * FROM "DateFiltered" WHERE "Type" = 1 AND
+"ParentId" in (SELECT "Id" FROM "DateFiltered" WHERE "Type" = 2)$$
+LANGUAGE SQL
+
+

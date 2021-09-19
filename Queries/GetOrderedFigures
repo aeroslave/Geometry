@@ -1,0 +1,13 @@
+CREATE OR REPLACE FUNCTION GetOrderedFigures(timestamp)
+RETURNS SETOF "Figures" AS 
+$$ 
+With
+RECURSIVE "tree" ("Id", "Area", "ParentId", "Type", "DateAndTime", "lvl") AS (
+	SELECT *, 0 FROM "Figures" WHERE "ParentId" IS NULL
+    UNION ALL
+    SELECT "Figures".*, lvl + 1 FROM "Figures" INNER JOIN "tree" on "tree"."Id" = "Figures"."ParentId")
+
+SELECT "Id", "Area", "ParentId", "Type", "DateAndTime" FROM
+(SELECT DISTINCT * FROM "tree" WHERE "DateAndTime" = $1 ORDER BY lvl) AS "Ordered";
+$$
+LANGUAGE SQL
